@@ -1,4 +1,5 @@
 ﻿using WeatherAPI.Clients.Interfaces;
+using WeatherAPI.Controllers;
 using WeatherAPI.Dtos;
 using WeatherAPI.Services.Interfaces;
 
@@ -57,8 +58,10 @@ public class WeatherService : IWeatherService
                 Condition = currentWeather.Current.Condition.Text,
                 WindKph = currentWeather.Current.WindKph,
                 Humidity = currentWeather.Current.Humidity,
+                Icon = currentWeather.Current.Condition.Icon,
                 Cloud = currentWeather.Current.Cloud,
                 IsDay = currentWeather.Current.IsDay == 1
+            
             },
             Timezone = new TimezoneDetailsDto
             {

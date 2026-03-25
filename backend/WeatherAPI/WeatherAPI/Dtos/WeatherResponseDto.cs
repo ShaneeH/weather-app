@@ -19,6 +19,7 @@ public class WeatherDetailsDto
     public int Humidity { get; set; }
     public int Cloud { get; set; }
     public bool IsDay { get; set; }
+    public string Icon { get; set; } = string.Empty;
 }
 
 public class TimezoneDetailsDto
