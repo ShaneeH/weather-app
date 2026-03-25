@@ -1,15 +1,17 @@
+using WeatherAPI.Clients;
+using WeatherAPI.Clients.Interfaces;
+using WeatherAPI.Configuration;
 using WeatherAPI.Services;
 using WeatherAPI.Services.Interfaces;
-using WeatherAPI.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<WeatherApiOptions>(
     builder.Configuration.GetSection("WeatherApi"));
 
-builder.Services.AddHttpClient<IWeatherService, WeatherService>();
 
-//builder.Services.AddSingleton<IWeatherService, WeatherService>();
+builder.Services.AddHttpClient<IWeatherApiClient, WeatherApiClient>();
+builder.Services.AddScoped<IWeatherService, WeatherService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
