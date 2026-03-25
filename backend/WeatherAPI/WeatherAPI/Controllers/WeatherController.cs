@@ -1,15 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace WeatherAPI.Controllers
+namespace WeatherAPI.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class WeatherController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class WeatherController : ControllerBase
+    [HttpGet("{city}")]
+    public IActionResult GetWeatherByCity(string city)
     {
-        [HttpGet]
-        public string Get()
+        return Ok(new
         {
-            return "API is running";
-        }
+            message = $"Backend received city: {city}"
+        });
     }
 }
