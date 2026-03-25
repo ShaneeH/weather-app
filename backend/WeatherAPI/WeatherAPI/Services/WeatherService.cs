@@ -9,12 +9,12 @@ namespace WeatherAPI.Services;
 
 public class WeatherService : IWeatherService
 {
-    private static readonly HashSet<string> AvailableCities =
-    [
-        "Dublin",
-        "Tokyo",
-        "Chicago"
-    ];
+    private static readonly HashSet<string> AvailableCities = new(StringComparer.OrdinalIgnoreCase)
+{
+    "Dublin",
+    "Tokyo",
+    "Chicago"
+};
 
     private readonly HttpClient _httpClient;
     private readonly WeatherApiOptions _weatherApiOptions;
