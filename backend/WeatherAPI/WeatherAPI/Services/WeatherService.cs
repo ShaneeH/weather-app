@@ -1,4 +1,6 @@
-﻿using WeatherAPI.Dtos;
+﻿using Microsoft.Extensions.Options;
+using WeatherAPI.Configuration;
+using WeatherAPI.Dtos;
 using WeatherAPI.Services.Interfaces;
 
 namespace WeatherAPI.Services;
@@ -11,6 +13,15 @@ public class WeatherService : IWeatherService
         "Tokyo",
         "Chicago"
     ];
+
+    private readonly HttpClient _httpClient;
+    private readonly WeatherApiOptions _weatherApiOptions;
+
+    public WeatherService(HttpClient httpClient, IOptions<WeatherApiOptions> weatherApiOptions)
+    {
+        _httpClient = httpClient;
+        _weatherApiOptions = weatherApiOptions.Value;
+    }
 
     public IReadOnlyCollection<string> GetAvailableCities()
     {
@@ -26,7 +37,7 @@ public class WeatherService : IWeatherService
     public Task<WeatherResponseDto> GetWeatherByCityAsync(string city)
     {
         var response = new WeatherResponseDto
-     {
+        {
             City = city,
             Weather = new WeatherDetailsDto
             {

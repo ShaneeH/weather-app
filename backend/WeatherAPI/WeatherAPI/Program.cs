@@ -1,9 +1,15 @@
 using WeatherAPI.Services;
 using WeatherAPI.Services.Interfaces;
+using WeatherAPI.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSingleton<IWeatherService, WeatherService>();
+builder.Services.Configure<WeatherApiOptions>(
+    builder.Configuration.GetSection("WeatherApi"));
+
+builder.Services.AddHttpClient<IWeatherService, WeatherService>();
+
+//builder.Services.AddSingleton<IWeatherService, WeatherService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
