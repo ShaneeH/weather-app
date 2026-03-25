@@ -1,15 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onBeforeMount } from 'vue'
+import { httpClient } from '../api/httpClient'
 import viteLogo from '../assets/vite.svg'
 import heroImg from '../assets/hero.png'
 import vueLogo from '../assets/vue.svg'
-import { onBeforeMount } from 'vue'
+import CitySelector from '../components/CitySelector.vue'
+const url: string = "https://localhost:7157/api/weather/cities";
 
-const count = ref(0)
+ onBeforeMount(() => {
+  localStorage.setItem('HEY', 'D');
 
-onBeforeMount(() => 
-{
-  localStorage.setItem('HEY' , 'D');
+
+  httpClient.get(url).then(data => {
+    console.log(data)
+  }) 
 })
 
 </script>
@@ -23,6 +27,7 @@ onBeforeMount(() =>
     </div>
     <div>
       <h1>Tokyo</h1>
+      <CitySelector />
     </div>
   </section>
 
@@ -32,3 +37,4 @@ onBeforeMount(() =>
   <div class="ticks"></div>
   <section id="spacer"></section>
 </template>
+
