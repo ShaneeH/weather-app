@@ -13,6 +13,17 @@ builder.Services.Configure<WeatherApiOptions>(
 builder.Services.AddHttpClient<IWeatherApiClient, WeatherApiClient>();
 builder.Services.AddScoped<IWeatherService, WeatherService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("FrontendPolicy", policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
@@ -30,6 +41,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseCors("FrontendPolicy");
 
 app.MapControllers();
 
