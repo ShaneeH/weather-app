@@ -22,11 +22,19 @@ public class WeatherController : ControllerBase
     }
 
     [HttpGet("{city}")]
-    public IActionResult GetWeather(string city)
+    public async Task<IActionResult> GetWeather(string city)
     {
-        return Ok(new
+        if (!_weatherService.IsSupportedCity(city))
         {
-            message = $"Backend received city: {city}"
-        });
+            return BadRequest(new
+            {
+                error = "Invalid city.",
+                allowedCities = _weatherService.GetAvailableCities()
+            });
+        }
+
+        var weather = await _weatherService.GetWeatherByCityAsync(city);
+
+        return Ok(weather);
     }
 }
