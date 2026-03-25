@@ -15,14 +15,14 @@ public class WeatherController : ControllerBase
     }
 
     [HttpGet("cities")]
-    public IActionResult GetCities()
+    public IActionResult GetAvailableCities()
     {
         var cities = _weatherService.GetAvailableCities();
         return Ok(cities);
     }
 
     [HttpGet("{city}")]
-    public async Task<IActionResult> GetWeather(string city)
+    public async Task<IActionResult> GetWeatherByCity(string city)
     {
         if (!_weatherService.IsSupportedCity(city))
         {

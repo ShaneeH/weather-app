@@ -32,20 +32,24 @@ public class WeatherApiClient : IWeatherApiClient
         }
     }
 
-    public Task<CurrentWeatherApiResponseDto> GetCurrentWeatherAsync(string city)
+    // Current Weather Endpoint
+    public Task<CurrentWeatherApiResponseDto> GetCurrentWeatherAsync(string city) 
     {
         return GetFromApiAsync<CurrentWeatherApiResponseDto>($"current.json?q={city}");
     }
 
+    // Timezone Endpoint
     public Task<TimezoneApiResponseDto> GetTimezoneAsync(string city)
     {
         return GetFromApiAsync<TimezoneApiResponseDto>($"timezone.json?q={city}");
     }
 
+    // Astronomy Endpoint
     public Task<AstronomyApiResponseDto> GetAstronomyAsync(string city)
     {
         return GetFromApiAsync<AstronomyApiResponseDto>($"astronomy.json?q={city}");
     }
+
 
     private async Task<T> GetFromApiAsync<T>(string endpoint)
     {

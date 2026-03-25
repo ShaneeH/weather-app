@@ -1,6 +1,8 @@
 ﻿namespace WeatherAPI.Dtos;
 
-//According to the spec sheet
+// Response DTO returned by the API.
+// Aggregates weather, timezone, and astronomy data from the RapidAPI endpoints
+// into a single response object for the client.
 public class WeatherResponseDto
 {
     public string City { get; set; } = string.Empty;

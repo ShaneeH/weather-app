@@ -6,7 +6,8 @@ namespace WeatherAPI.Services;
 
 public class WeatherService : IWeatherService
 {
-    private static readonly HashSet<string> AvailableCities = new(StringComparer.OrdinalIgnoreCase)
+    // HashSet for Peformance faster than a List and since all entries are unique
+    private static readonly HashSet<string> _availableCities = new(StringComparer.OrdinalIgnoreCase)
     {
         "Dublin",
         "Tokyo",
@@ -18,16 +19,17 @@ public class WeatherService : IWeatherService
     public WeatherService(IWeatherApiClient weatherApiClient)
     {
         _weatherApiClient = weatherApiClient;
+
     }
 
     public IReadOnlyCollection<string> GetAvailableCities()
     {
-        return AvailableCities.ToList().AsReadOnly();
+        return _availableCities; ;
     }
 
     public bool IsSupportedCity(string city)
     {
-        return !string.IsNullOrWhiteSpace(city) && AvailableCities.Contains(city);
+        return !string.IsNullOrWhiteSpace(city) && _availableCities.Contains(city);
     }
 
     public async Task<WeatherResponseDto> GetWeatherByCityAsync(string city)
@@ -38,12 +40,14 @@ public class WeatherService : IWeatherService
         var timezoneTask = _weatherApiClient.GetTimezoneAsync(normalizedCity);
         var astronomyTask = _weatherApiClient.GetAstronomyAsync(normalizedCity);
 
+        // Run the three API calls concurrently to reduce response time
         await Task.WhenAll(currentWeatherTask, timezoneTask, astronomyTask);
 
         var currentWeather = await currentWeatherTask;
         var timezone = await timezoneTask;
         var astronomy = await astronomyTask;
 
+        // This is the Final Aggregated Object we Return to the CLient
         return new WeatherResponseDto
         {
             City = normalizedCity,
@@ -75,16 +79,6 @@ public class WeatherService : IWeatherService
 
     private static string GetNormalizedCity(string city)
     {
-        if (string.Equals(city, "chicago", StringComparison.OrdinalIgnoreCase))
-        {
-            return "Chicago";
-        }
-
-        if (string.Equals(city, "tokyo", StringComparison.OrdinalIgnoreCase))
-        {
-            return "Tokyo";
-        }
-
-        return "Dublin";
+        return _availableCities.First(c => c.Equals(city, StringComparison.OrdinalIgnoreCase));
     }
 }
