@@ -1,34 +1,35 @@
 <script setup lang="ts">
-import { httpClient } from '../api/httpClient'
-import viteLogo from '../assets/vite.svg'
 import heroImg from '../assets/hero.png'
 import vueLogo from '../assets/vue.svg'
 import CitySelector from '../components/CitySelector.vue'
+import.meta.env.CITIES_URL
 import { ref, onMounted, watch } from 'vue'
+import { getCities } from '../services/weatherService'
+import { getSelectedCity, setSelectedCity } from "../services/localStorageService"
 
 
 const cities = ref<string[]>([])
-const selectedCity = ref('')
+const selectedCity = ref("")
 
 onMounted(async () => {
   try {
-    cities.value = await httpClient.get<string[]>('https://localhost:7157/api/weather/cities')
+    cities.value = await getCities()
 
-    const savedCity = localStorage.getItem('selectedCity')
+    const savedCity = getSelectedCity()
 
-    if (savedCity && cities.value.includes(savedCity)) {
+    if (cities.value.includes(savedCity)) {
       selectedCity.value = savedCity
     } else if (cities.value.length > 0) {
       selectedCity.value = cities.value[0]
     }
   } catch (error) {
-    console.error('Failed to load cities:', error)
+    console.error("Failed to fetch cities:", error)
   }
 })
 
 watch(selectedCity, (newCity) => {
   if (newCity) {
-    localStorage.setItem('selectedCity', newCity)
+    setSelectedCity(newCity)
   }
 })
 
@@ -40,7 +41,7 @@ watch(selectedCity, (newCity) => {
     <div class="hero">
       <img :src="heroImg" class="base" width="170" height="179" alt="" />
       <img :src="vueLogo" class="framework" alt="Vue logo" />
-      <img :src="viteLogo" class="vite" alt="Vite logo" />
+ 
     </div>
     <h2> {{ selectedCity }}</h2>
     <div>
