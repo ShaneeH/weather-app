@@ -30,18 +30,11 @@ function onCityChange(event: Event) {
           {{ city }}
         </option>
       </select>
-
-      <!-- Custom chevron -->
-      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="6 9 12 15 18 9" />
-      </svg>
     </div>
   </div>
 </template>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap');
-
 .city-selector {
   display: flex;
   flex-direction: column;
@@ -67,8 +60,8 @@ function onCityChange(event: Event) {
   width: 100%;
   appearance: none;
   -webkit-appearance: none;
-  background: #0d1120;
-  color: #e8eaf0;
+  background: #2b2b2b;
+  color: #bdbcbc;
   border: 1px solid #1e2540;
   border-radius: 10px;
   padding: 11px 42px 11px 16px;
@@ -90,19 +83,8 @@ function onCityChange(event: Event) {
   box-shadow: 0 0 0 3px rgba(240, 165, 0, 0.12);
 }
 
-/* Style the dropdown options */
 .select option {
-  background: #0d1120;
-  color: #e8eaf0;
-}
-
-.chevron {
-  position: absolute;
-  right: 14px;
-  width: 14px;
-  height: 14px;
+  background: #616161;
   color: #f0a500;
-  pointer-events: none;
-  flex-shrink: 0;
 }
 </style>
