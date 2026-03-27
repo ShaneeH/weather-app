@@ -151,7 +151,7 @@ watch(selectedCity, async (newCity) => {
         <section class="astro-row">
           <div class="astro-block">
             <div class="astro-header">
-              <svg class="astro-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <svg class="astro-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/>
                 <line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
                 <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="4" y2="12"/>
@@ -176,7 +176,7 @@ watch(selectedCity, async (newCity) => {
 
           <div class="astro-block">
             <div class="astro-header">
-              <svg class="astro-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <svg class="astro-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
               </svg>
               <span>MOON</span>
@@ -484,16 +484,25 @@ watch(selectedCity, async (newCity) => {
   align-items: center;
   gap: 8px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 16px;
   letter-spacing: 0.2em;
   color: var(--muted);
   margin-bottom: 16px;
 }
-.astro-icon {
-  width: 16px;
-  height: 16px;
-  color: var(--amber);
+
+.astro-sun {
+  width: 24px;
+  height: 24px;
+  color: rgb(185, 176, 76);
+  
 }
+
+.astro-moon {
+  width: 24px;
+  height: 24px;
+  color: rgb(97, 97, 216);
+}
+
 
 .astro-times {
   display: flex;
@@ -508,7 +517,7 @@ watch(selectedCity, async (newCity) => {
 }
 .astro-event {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 14px;
   letter-spacing: 0.12em;
   color: var(--muted);
 }
