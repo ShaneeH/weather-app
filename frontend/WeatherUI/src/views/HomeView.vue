@@ -4,19 +4,24 @@ import { ref, onMounted, watch } from 'vue'
 import { getCities, getWeatherByCity } from '../services/weatherService'
 import { getSelectedCity, setSelectedCity } from "../services/localStorageService"
 import type { CityWeatherData } from '../types/weather'
+import { formatTime } from '../utils/time'
 
 const cities = ref<string[]>([])
 const selectedCity = ref("")
 const weatherData = ref<CityWeatherData | null>(null)
 const isLoading = ref(false)
+const error = ref<string | null>(null)
 
 async function loadWeather(city: string) {
   if (!city) return
   try {
     isLoading.value = true
+    error.value = null
     weatherData.value = await getWeatherByCity(city)
-  } catch (error) {
-    console.error("Failed to fetch weather:", error)
+  } catch (err) {
+    console.error("Failed to fetch weather:", err)
+    error.value = "Failed to load weather data. Please try again."
+    weatherData.value = null
   } finally {
     isLoading.value = false
   }
@@ -32,8 +37,9 @@ onMounted(async () => {
       selectedCity.value = cities.value[0]
     }
     await loadWeather(selectedCity.value)
-  } catch (error) {
-    console.error("Failed to load data:", error)
+  } catch (err) {
+    console.error("Failed to load cities:", err)
+    error.value = "Failed to load city list. Please refresh the page."
   }
 })
 
@@ -51,22 +57,30 @@ watch(selectedCity, async (newCity) => {
 
     <div class="station-inner">
 
-     
+      <!-- Header -->
       <header class="station-header">
-  
-
         <div class="header-right">
           <CitySelector v-model="selectedCity" :cities="cities" />
         </div>
       </header>
 
-      <!-- ── Loading ────────────────────────────────── -->
-      <div v-if="isLoading" class="loading-frame">
+      <!-- Error-->
+      <div v-if="error" class="error-state" role="alert">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="error-icon">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        <span>{{ error }}</span>
+      </div>
+
+      <!-- if Loading Display -->
+      <div v-else-if="isLoading" class="loading-frame">
         <span class="loading-bar"></span>
         <span class="loading-text">Loading Data...</span>
       </div>
 
-      <!-- ── Main content ───────────────────────────── -->
+      <!-- Main Display -->
       <template v-else-if="weatherData">
 
         <!-- Primary readout -->
@@ -74,17 +88,13 @@ watch(selectedCity, async (newCity) => {
           <div class="readout-left">
             <p class="readout-location">
               {{ weatherData.city }}
-    
             </p>
             <div class="readout-temp">
               {{ weatherData.weather.temperatureC }}<span class="readout-unit">°C</span>
             </div>
             <div class="readout-condition">
-              <img
-                :src="'https:' + weatherData.weather.icon"
-                class="condition-icon"
-                alt=""
-              />
+              <img :src="'https:' + weatherData.weather.icon" :alt="weatherData.weather.condition"
+                class="condition-icon" />
               <span>{{ weatherData.weather.condition }}</span>
             </div>
           </div>
@@ -92,7 +102,7 @@ watch(selectedCity, async (newCity) => {
           <div class="readout-right">
             <div class="pill-stat">
               <span class="pill-label">LOCAL TIME</span>
-              <span class="pill-value">{{ weatherData.timezone.localTime }}</span>
+              <span class="pill-value">{{ formatTime(weatherData.timezone.localTime) }}</span>
             </div>
             <div class="pill-stat">
               <span class="pill-label">DAYTIME</span>
@@ -126,13 +136,8 @@ watch(selectedCity, async (newCity) => {
             <span class="metric-label">CLOUD COVER</span>
             <span class="metric-value">{{ weatherData.weather.cloud }}</span>
             <span class="metric-unit">%</span>
-
-            <!-- Visual bar -->
             <div class="metric-bar-track">
-              <div
-                class="metric-bar-fill"
-                :style="{ width: weatherData.weather.cloud + '%' }"
-              ></div>
+              <div class="metric-bar-fill" :style="{ width: weatherData.weather.cloud + '%' }"></div>
             </div>
           </div>
 
@@ -152,11 +157,15 @@ watch(selectedCity, async (newCity) => {
           <div class="astro-block">
             <div class="astro-header">
               <svg class="astro-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/>
-                <line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="4" y2="12"/>
-                <line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                <circle cx="12" cy="12" r="4" />
+                <line x1="12" y1="2" x2="12" y2="4" />
+                <line x1="12" y1="20" x2="12" y2="22" />
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                <line x1="2" y1="12" x2="4" y2="12" />
+                <line x1="20" y1="12" x2="22" y2="12" />
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
               </svg>
               <span>SUN</span>
             </div>
@@ -177,7 +186,7 @@ watch(selectedCity, async (newCity) => {
           <div class="astro-block">
             <div class="astro-header">
               <svg class="astro-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
               </svg>
               <span>MOON</span>
             </div>
@@ -196,6 +205,7 @@ watch(selectedCity, async (newCity) => {
 
       </template>
 
+      <!-- if Empty display  -->
       <div v-else class="empty-state">
         <span>SELECT A CITY TO BEGIN</span>
       </div>
@@ -207,8 +217,6 @@ watch(selectedCity, async (newCity) => {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
 
-
-
 .station {
   position: relative;
   min-height: 100vh;
@@ -218,19 +226,16 @@ watch(selectedCity, async (newCity) => {
   overflow: hidden;
 }
 
-/* Scanlines */
 .scanlines {
   pointer-events: none;
   position: fixed;
   inset: 0;
   z-index: 9;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 3px,
-    rgba(0,0,0,0.07) 3px,
-    rgba(0,0,0,0.07) 4px
-  );
+  background: repeating-linear-gradient(0deg,
+      transparent,
+      transparent 3px,
+      rgba(0, 0, 0, 0.07) 3px,
+      rgba(0, 0, 0, 0.07) 4px);
 }
 
 .station-inner {
@@ -241,38 +246,16 @@ watch(selectedCity, async (newCity) => {
   padding: 36px 28px 64px;
 }
 
-
+/* ── Header ───────────────────────────────────────── */
 .station-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 20px;
   flex-wrap: wrap;
   margin-bottom: 40px;
   padding-bottom: 24px;
   border-bottom: 1px solid var(--border);
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: var(--text);
-}
-.brand em {
-  font-style: normal;
-  color: var(--amber);
-}
-.brand-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--amber);
-  box-shadow: 0 0 8px var(--amber);
 }
 
 .header-right {
@@ -282,8 +265,29 @@ watch(selectedCity, async (newCity) => {
   flex-wrap: wrap;
 }
 
+/* ── Error state  */
+.error-state {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: rgba(240, 82, 82, 0.08);
+  border: 1px solid rgba(240, 82, 82, 0.3);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  color: #f05252;
+  margin-bottom: 24px;
+}
 
+.error-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
 
+/* ── Primary readout  */
 .primary-readout {
   display: flex;
   justify-content: space-between;
@@ -302,9 +306,6 @@ watch(selectedCity, async (newCity) => {
   color: var(--muted);
   text-transform: uppercase;
 }
-.readout-tz {
-  color: var(--amber);
-}
 
 .readout-temp {
   font-size: clamp(64px, 12vw, 108px);
@@ -313,6 +314,7 @@ watch(selectedCity, async (newCity) => {
   color: var(--text);
   letter-spacing: -0.03em;
 }
+
 .readout-unit {
   font-size: 0.35em;
   font-weight: 400;
@@ -330,9 +332,10 @@ watch(selectedCity, async (newCity) => {
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
+
 .condition-icon {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
 }
 
 .readout-right {
@@ -352,29 +355,37 @@ watch(selectedCity, async (newCity) => {
   flex-direction: column;
   gap: 5px;
 }
+
 .pill-label {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 14px;
   letter-spacing: 0.15em;
   color: var(--muted);
 }
+
 .pill-value {
   font-family: var(--font-mono);
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 700;
   color: var(--text);
 }
-.accent-yes { color: var(--green); }
-.accent-no  { color: var(--muted); }
 
+.accent-yes {
+  color: var(--green);
+}
 
+.accent-no {
+  color: var(--muted);
+}
+
+/* ── Rule ─────────────────────────────────────────── */
 .rule {
   display: flex;
   align-items: center;
   gap: 16px;
   margin-bottom: 20px;
-  
 }
+
 .rule::before,
 .rule::after {
   content: '';
@@ -382,16 +393,16 @@ watch(selectedCity, async (newCity) => {
   height: 1px;
   background: var(--border);
 }
+
 .rule-label {
   font-family: var(--font-mono);
   font-size: 14px;
   letter-spacing: 0.2em;
   color: #807a5a;
   white-space: nowrap;
-
 }
 
-/* ── Metric grid ──────────────────────────────────── */
+/* ── Metric grid  */
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -409,10 +420,12 @@ watch(selectedCity, async (newCity) => {
   gap: 4px;
   transition: border-color 0.2s, transform 0.2s;
 }
+
 .metric-card:hover {
-  border-color: rgba(240,165,0,0.35);
+  border-color: rgba(240, 165, 0, 0.35);
   transform: translateY(-2px);
 }
+
 .metric-card.wide {
   grid-column: span 2;
 }
@@ -423,6 +436,7 @@ watch(selectedCity, async (newCity) => {
   letter-spacing: 0.18em;
   color: var(--muted);
 }
+
 .metric-value {
   font-size: 32px;
   font-weight: 800;
@@ -430,12 +444,14 @@ watch(selectedCity, async (newCity) => {
   line-height: 1.1;
   letter-spacing: -0.02em;
 }
+
 .metric-value.mono {
   font-family: var(--font-mono);
   font-size: 18px;
   font-weight: 600;
   letter-spacing: 0;
 }
+
 .metric-unit {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -443,7 +459,6 @@ watch(selectedCity, async (newCity) => {
   margin-top: -2px;
 }
 
-/* Cloud bar */
 .metric-bar-track {
   margin-top: 10px;
   height: 4px;
@@ -451,6 +466,7 @@ watch(selectedCity, async (newCity) => {
   border-radius: 2px;
   overflow: hidden;
 }
+
 .metric-bar-fill {
   height: 100%;
   background: linear-gradient(90deg, var(--amber), var(--amber2));
@@ -458,7 +474,7 @@ watch(selectedCity, async (newCity) => {
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ── Astro row ────────────────────────────────────── */
+/* ── Astro row  */
 .astro-row {
   display: flex;
   gap: 0;
@@ -494,7 +510,6 @@ watch(selectedCity, async (newCity) => {
   width: 24px;
   height: 24px;
   color: rgb(185, 176, 76);
-  
 }
 
 .astro-moon {
@@ -503,24 +518,26 @@ watch(selectedCity, async (newCity) => {
   color: rgb(97, 97, 216);
 }
 
-
 .astro-times {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
+
 .astro-time-row {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: 12px;
 }
+
 .astro-event {
   font-family: var(--font-mono);
   font-size: 14px;
   letter-spacing: 0.12em;
   color: var(--muted);
 }
+
 .astro-time {
   font-family: var(--font-mono);
   font-size: 15px;
@@ -528,7 +545,7 @@ watch(selectedCity, async (newCity) => {
   color: var(--text);
 }
 
-
+/* ── Loading  */
 .loading-frame {
   display: flex;
   flex-direction: column;
@@ -536,6 +553,7 @@ watch(selectedCity, async (newCity) => {
   gap: 16px;
   padding: 80px 0;
 }
+
 .loading-bar {
   display: block;
   width: 160px;
@@ -545,6 +563,7 @@ watch(selectedCity, async (newCity) => {
   overflow: hidden;
   position: relative;
 }
+
 .loading-bar::after {
   content: '';
   position: absolute;
@@ -552,10 +571,17 @@ watch(selectedCity, async (newCity) => {
   background: linear-gradient(90deg, transparent, var(--amber), transparent);
   animation: sweep 1.4s ease-in-out infinite;
 }
+
 @keyframes sweep {
-  0%   { transform: translateX(-100%); }
-  100% { transform: translateX(200%); }
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(200%);
+  }
 }
+
 .loading-text {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -563,6 +589,7 @@ watch(selectedCity, async (newCity) => {
   color: var(--muted);
 }
 
+/* ── Empty state  */
 .empty-state {
   padding: 80px 0;
   text-align: center;
@@ -572,4 +599,28 @@ watch(selectedCity, async (newCity) => {
   color: var(--muted);
 }
 
+/* ── Responsive */
+@media (max-width: 640px) {
+  .station-inner {
+    padding: 24px 18px 48px;
+  }
+
+  .readout-right {
+    min-width: unset;
+    width: 100%;
+  }
+
+  .metric-card.wide {
+    grid-column: span 1;
+  }
+
+  .astro-row {
+    flex-direction: column;
+  }
+
+  .astro-divider {
+    width: auto;
+    height: 1px;
+  }
+}
 </style>

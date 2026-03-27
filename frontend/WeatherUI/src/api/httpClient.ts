@@ -2,15 +2,15 @@ import axios from "axios"
 import type { AxiosInstance, AxiosRequestConfig } from "axios"
 
 class HttpClient {
-  private client: AxiosInstance
+  private readonly client: AxiosInstance
 
   constructor() {
     this.client = axios.create({
-      baseURL: 'https://localhost:7157', // -> Usually this would be kept in .env
+      baseURL: import.meta.env.VITE_API_BASE_URL ?? "https://localhost:7157",
       timeout: 5000,
       headers: {
-        "Content-Type": "application/json"
-      }
+        "Content-Type": "application/json",
+      },
     })
   }
 

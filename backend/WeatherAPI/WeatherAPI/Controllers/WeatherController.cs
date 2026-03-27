@@ -21,7 +21,7 @@ public class WeatherController : ControllerBase
         return Ok(cities);
     }
 
-    [HttpGet("{city}")] // - > BaseURL/${City} Endpoint
+    [HttpGet("{city}")]
     public async Task<IActionResult> GetWeatherByCity(string city)
     {
         if (!_weatherService.IsSupportedCity(city))
@@ -33,8 +33,17 @@ public class WeatherController : ControllerBase
             });
         }
 
-        var weather = await _weatherService.GetWeatherByCityAsync(city);
-
-        return Ok(weather);
+        try
+        {
+            var weather = await _weatherService.GetWeatherByCityAsync(city);
+            return Ok(weather);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(502, new
+            {
+                error = "Failed to retrieve weather data. Please try again later."
+            });
+        }
     }
 }
