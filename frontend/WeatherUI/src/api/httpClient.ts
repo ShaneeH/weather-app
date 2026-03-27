@@ -6,7 +6,7 @@ class HttpClient {
 
   constructor() {
     this.client = axios.create({
-      baseURL: import.meta.env.VITE_API_BASE_URL,
+      baseURL: 'https://localhost:7157', // -> Usually this would be kept in .env
       timeout: 5000,
       headers: {
         "Content-Type": "application/json"

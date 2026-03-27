@@ -2,7 +2,7 @@
 
 // Response DTO returned by the API.
 // Aggregates weather, timezone, and astronomy data from the RapidAPI endpoints
-// into a single response object for the client.
+// into a single response to the client
 public class WeatherResponseDto
 {
     public string City { get; set; } = string.Empty;

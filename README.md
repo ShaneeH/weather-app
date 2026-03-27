@@ -25,3 +25,9 @@ C#
 
 ### External API
 WeatherAPI via RapidAPI
+
+### Running the App
+Make sure the .NET API is running before starting the Vue frontend. 
+This App is configured that the C# API Is running on Port `https://localhost:7157`.
+And the Vue FrontEnd is running at `https://localhost:5173`
+
