@@ -39,15 +39,12 @@ Vue frontend runs at:
 
 ### Run the Frontend :
 - `git clone https://github.com/ShaneeH/weather-app.git`
-- `cd weather-app`
+- `cd weather-app/frontend/WeatherUI`
 - `npm install`
 - `npm run dev`
 
 ### Run the Backend API : 
-> Assuming the repo has already been cloned locally
-
- - Navigate to the WeatherAPI project folder
-- `cd WeatherAPI`
+- `cd weather-app/backend/WeatherAPI/WeatherAPI`
 - `dotnet restore`
 - `dotnet run`
 
